@@ -24,7 +24,7 @@ def get_signature(package_name, location):
     """
     returns the signature as a string
     """
-    filename = "{0}\{1}.apk".format(location,package_name)
+    filename = "{0}/{1}.apk".format(location,package_name)
     with open(filename,"rb") as f:
         z = zipfile.ZipFile(f)
         for n in z.namelist():
@@ -47,8 +47,8 @@ def get_google_play_info(package_name):
     return {'score':score, 'email':email, 'downloads':downloads}
 
 def main():
-    PACKAGE_NAME = "com.example.appname"
-    LOCATION = "C:\YourFolder\APKs"
+    LOCATION = str("C:/YourFolder/APKs")
+    PACKAGE_NAME = raw_input('Enter package name: ')
 
     download_apk(PACKAGE_NAME, LOCATION)
     time.sleep(5)
