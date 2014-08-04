@@ -41,7 +41,7 @@ def get_google_play_info(package_name):
     tree = BeautifulSoup.BeautifulSoup(response_text)
     score = float(tree.findAll(attrs={'class':'score'})[0].contents[0])
     email_results = tree.findAll(attrs={'class':'dev-link'})
-    a=str(email_results[0])
+    a=str(email_results[-1])
     email = a[a.find("mailto:")+7:a.find("rel")-2]
     downloads = str(tree.findAll(attrs={'itemprop':'numDownloads'})[0].contents[0])
     return {'score':score, 'email':email, 'downloads':downloads}
