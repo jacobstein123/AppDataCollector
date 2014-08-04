@@ -54,3 +54,6 @@ def main():
     time.sleep(5)
     print get_signature(PACKAGE_NAME, LOCATION)
     print get_google_play_info(PACKAGE_NAME)
+
+if __name__ == "__main__":
+    main()
