@@ -101,14 +101,18 @@ def get_google_play_info(package_name):
     return {'package_name':package_name, 'score':score, 'email':email, 'downloads':downloads, 'dev_name':dev_name}
 
 def add_to_database(db, info):
+    update = False
     if execute_query(db,'select * from apps where package_name="{0}";'.format(info['package_name'])):
         if not 'y' in raw_input('Row exists, update? (y/n) ').lower():
             return
+        update = True
     if not execute_query(db,'select * from developers where developer_name="{0}";'.format(info['dev_name'])):
         execute_command(db,'insert into developers (developer_name, developer_email) values ("{0}","{1}");'.format(info['dev_name'],info['email']))
     data = execute_query(db,'select * from developers where developer_name="{0}";'.format(info['dev_name']))
     dev_id = data[0]['developer_id']
-    execute_command(db,'replace into apps (package_name, rating, downloads, developer_id) values ("{0}","{1}","{2}","{3}");'.format(info['package_name'],info['score'],info['downloads'],dev_id))
+    if update:
+        execute_command(db,'delete from apps where package_name="{0}";'.format(info['package_name']))
+    execute_command(db,'insert into apps (package_name, rating, downloads, developer_id) values ("{0}","{1}","{2}","{3}");'.format(info['package_name'],info['score'],info['downloads'],dev_id))
 
 def main():
     db = {'host'  : 'localhost',
