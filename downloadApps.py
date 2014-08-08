@@ -1,11 +1,6 @@
 import time
 import clicker
-from getGooglePlayData import execute_command, execute_query
-
-db = {'host'  : 'localhost',
-      'user'  : 'root',
-      'passwd': '',
-      'db'    : 'mysql'}
+from getGooglePlayData import execute_command, execute_query, db
 
 apps_to_download = execute_query(db,'select * from apps where apk_file is NULL;')
 for app in apps_to_download:

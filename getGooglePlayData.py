@@ -7,6 +7,11 @@ import urllib2
 import os
 import MySQLdb as sql
 
+db = {'host'  : 'localhost',
+          'user'  : 'root',
+          'passwd': '',
+          'db'    : 'mysql'}
+
 def execute_command(db, command):
     '''
     Executes the given command on MySQL database.
@@ -96,16 +101,24 @@ def get_google_play_info(package_name):
     else:
         a=str(email_results[1])
     email = a[a.find("mailto:")+7:a.find("rel")-2]
+    if '@' not in email:
+        email = None
     downloads = ''.join([i for i in str(tree.findAll(attrs={'itemprop':'numDownloads'})[0].contents[0]) if i!=" "])
     dev_name = str(tree.findAll(attrs={'itemprop':'name'})[1].contents[0])
     return {'package_name':package_name, 'score':score, 'email':email, 'downloads':downloads, 'dev_name':dev_name}
 
-def add_to_database(db, info):
+def package_in_database(db, package_name):
+    return execute_query(db,'select * from apps where package_name="{0}";'.format(package_name))
+
+def add_to_database(db, info, offer_update=True):
     update = False
     if execute_query(db,'select * from apps where package_name="{0}";'.format(info['package_name'])):
-        if not 'y' in raw_input('Row exists, update? (y/n) ').lower():
+        if offer_update:
+            if not 'y' in raw_input('Row with name {0} exists, update? (y/n) '.format(info['package_name'])).lower():
+                return
+            update = True
+        else:
             return
-        update = True
     if not execute_query(db,'select * from developers where developer_name="{0}";'.format(info['dev_name'])):
         execute_command(db,'insert into developers (developer_name, developer_email) values ("{0}","{1}");'.format(info['dev_name'],info['email']))
     data = execute_query(db,'select * from developers where developer_name="{0}";'.format(info['dev_name']))
@@ -115,10 +128,6 @@ def add_to_database(db, info):
     execute_command(db,'insert into apps (package_name, rating, downloads, developer_id) values ("{0}","{1}","{2}","{3}");'.format(info['package_name'],info['score'],info['downloads'],dev_id))
 
 def main():
-    db = {'host'  : 'localhost',
-          'user'  : 'root',
-          'passwd': '',
-          'db'    : 'mysql'}
 
     LOCATION = str("C:\\SSD-Folders\\Google Drive (SSD)\\Projects\\AppDataGrabber\\Testing\\APKs")
     PACKAGE_NAME = raw_input('Enter package name: ')
